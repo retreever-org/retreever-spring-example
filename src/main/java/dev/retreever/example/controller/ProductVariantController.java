@@ -2,6 +2,7 @@ package dev.retreever.example.controller;
 
 import dev.retreever.annotation.ApiEndpoint;
 import dev.retreever.annotation.ApiGroup;
+import dev.retreever.annotation.Description;
 import dev.retreever.example.dto.envelope.ApiAck;
 import dev.retreever.example.dto.envelope.ApiResponse;
 import dev.retreever.example.dto.request.ProductVariantRequest;
@@ -44,7 +45,9 @@ public class ProductVariantController {
     )
     @PostMapping("/products/{productId}/variants")
     public ResponseEntity<ApiResponse<ProductVariantResponse>> createVariant(
-            @PathVariable UUID productId,
+            @Description("ID/Primary Key of the product to which the variant should belong.")
+            @PathVariable
+            UUID productId,
             @RequestBody @Valid ProductVariantRequest request
     ) {
         var response = variantService.createProductVariant(productId, request);

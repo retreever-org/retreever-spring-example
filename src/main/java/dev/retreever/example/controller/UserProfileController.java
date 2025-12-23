@@ -42,7 +42,7 @@ public class UserProfileController {
      * Public endpoint - no authentication required.
      */
     @PostMapping("/public/users/register")
-    public ResponseEntity<ApiAck> registerUser(@Valid @RequestBody UserCredentials request) {
+    public ResponseEntity<ApiAck> registerUser(@Valid UserCredentials request) {
         log.debug("User registration request received for email: {}", request.email());
         userProfileService.registerNewUser(request);
 
@@ -57,7 +57,7 @@ public class UserProfileController {
      */
     @PutMapping("/users/profile")
     @PreAuthorize("hasAuthority('customer')")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(@Valid @RequestBody UpdateUserProfileRequest request) {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(@Valid UpdateUserProfileRequest request) {
         log.debug("Update profile request received");
         UserProfileResponse response = userProfileService.updateProfile(request);
 

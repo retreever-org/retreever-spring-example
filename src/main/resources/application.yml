@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: retreever-example
+#retreever.enabled=false
+#logging.level.dev.retreever.schema.resolver=DEBUG
+#logging.level.dev.retreever.engine.SchemaResolutionOrchestrator=DEBUG
+#logging.level.dev.retreever.view.ApiDocumentAssembler=DEBUG
+#logging.level.dev.retreever.repo.ApiErrorRegistry=DEBUG
+server:
+  port: 9000
+
+# Retreever Environment Configuration
+retreever:
+  env:
+    variables:
+
+      - name: access-token
+        source:
+          request:
+            endpoints:
+              - /api/v1/public/login/login
+              - /api/v1/public/login/refresh
+            method: post
+            response:
+              body-attribute-path: data.access_token
+
+      - name: refresh-token
+        source:
+          request:
+            endpoints:
+            - /api/v1/public/login/login
+            - /api/v1/public/login/refresh
+            method: post
+            response:
+              body-attribute-path: data.refresh_token
