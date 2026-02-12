@@ -8,37 +8,37 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 public class ProductService {
-    public UUID createProduct(UUID storeId, UUID categoryId, @Valid ProductRequest request) {
+    public Long createProduct(Long storeId, Long categoryId, @Valid ProductRequest request) {
         return null;
     }
 
-    public ProductResponse getProduct(UUID productId) {
+    public ProductResponse getProduct(Long productId) {
         return null;
     }
 
-    public void publishProduct(UUID productId) {
+    public void publishProduct(Long productId) {
     }
 
     public List<ProductResponse> getProductsByFilter(ProductFilters filters, int page, int size) {
         return null;
     }
 
-    public ProductResponse updateProduct(UUID productId, @Valid ProductRequest request) {
+    public ProductResponse updateProduct(Long productId, @Valid ProductRequest request) {
         return null;
     }
 
-    public void deleteProduct(UUID productId) {
+    public void deleteProduct(Long productId) {
     }
 
     public List<String> getBrands() {
         return null;
     }
 
-    public CustomPage<ProductResponse> getProductsByStore(UUID storeId, int page, int size) {
+    public CustomPage<ProductResponse> getProductsByStore(Long storeId, int page, int size) {
         return null;
     }
 }

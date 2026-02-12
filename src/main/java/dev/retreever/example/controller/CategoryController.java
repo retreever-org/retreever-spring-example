@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.UUID;
+import java.lang.Long;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -28,9 +28,9 @@ public class CategoryController {
     @PostMapping("/categories")
     public ResponseEntity<ApiAck> createCategory(
             @Valid @RequestBody CategoryCreateRequest request,
-            @RequestParam(required = false) UUID parentId
+            @RequestParam(required = false) Long parentId
             ) {
-        UUID id = categoryService.createCategory(request, parentId);
+        Long id = categoryService.createCategory(request, parentId);
         return ResponseEntity
                 .created(URI.create("/api/v1/categories/" + id))
                 .body(ApiAck.success("Category Created"));
@@ -38,7 +38,7 @@ public class CategoryController {
 
     @GetMapping("/categories/{categoryId}")
     public ResponseEntity<ApiResponse<CategorySummary>> getCategory(
-            @PathVariable UUID categoryId
+            @PathVariable Long categoryId
             ) {
         CategorySummary summary = categoryService.getCategory(categoryId);
         return ResponseEntity.ok(ApiResponse.success("Category Retrieved", summary));
@@ -58,7 +58,7 @@ public class CategoryController {
 
     @PutMapping("/categories/{categoryId}")
     public ResponseEntity<ApiResponse<CategorySummary>> updateCategory(
-            @PathVariable UUID categoryId,
+            @PathVariable Long categoryId,
             @Valid @RequestBody CategoryUpdateRequest request
     ) {
         CategorySummary summary = categoryService.updateCategory(categoryId, request);
@@ -67,7 +67,7 @@ public class CategoryController {
 
     @PatchMapping("/categories/{categoryId}/status")
     public ResponseEntity<ApiResponse<CategorySummary>> updateCategoryStatus(
-            @PathVariable UUID categoryId,
+            @PathVariable Long categoryId,
             @RequestParam("value") CategoryStatus categoryStatus
             ) {
         CategorySummary summary = categoryService.updateCategoryStatus(categoryId, categoryStatus);
@@ -76,8 +76,8 @@ public class CategoryController {
 
     @PatchMapping("/categories/{categoryId}/parent")
     public ResponseEntity<ApiResponse<CategorySummary>> updateCategoryParent(
-            @PathVariable UUID categoryId,
-            @RequestParam("parent_id") UUID parentId
+            @PathVariable Long categoryId,
+            @RequestParam("parent_id") Long parentId
             ) {
         CategorySummary summary = categoryService.updateCategoryParent(categoryId, parentId);
         return ResponseEntity.ok(ApiResponse.success("Category Parent Updated", summary));

@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.lang.Long;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -41,7 +41,7 @@ public class CategoryThumbnailController {
      */
     @PostMapping("/categories/{categoryId}/thumbnail/confirm-upload")
     public ResponseEntity<ApiAck> confirmThumbnailUpload(
-            @PathVariable UUID categoryId,
+            @PathVariable Long categoryId,
             @RequestParam String objectKey
     ) {
         thumbnailService.confirmUpload(categoryId, objectKey, CATEGORY_THUMBNAIL_DIFFERENTIATOR);
@@ -49,7 +49,7 @@ public class CategoryThumbnailController {
     }
 
     @GetMapping("/public/categories/thumbnail")
-    public ResponseEntity<byte[]> downloadThumbnail(@RequestParam("id") UUID imageId) {
+    public ResponseEntity<byte[]> downloadThumbnail(@RequestParam("id") Long imageId) {
         DownloadFile file = thumbnailService.getThumbnail(imageId);
 
         return ResponseEntity.ok()

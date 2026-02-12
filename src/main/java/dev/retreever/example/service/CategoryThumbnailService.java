@@ -5,7 +5,7 @@ import dev.retreever.example.dto.shared.DownloadFile;
 import dev.retreever.example.dto.shared.S3PresignedUpload;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 public class CategoryThumbnailService {
@@ -13,10 +13,10 @@ public class CategoryThumbnailService {
         return null;
     }
 
-    public void confirmUpload(UUID categoryId, String objectKey, String categoryThumbnailDifferentiator) {
+    public void confirmUpload(Long categoryId, String objectKey, String categoryThumbnailDifferentiator) {
     }
 
-    public DownloadFile getThumbnail(UUID imageId) {
+    public DownloadFile getThumbnail(Long imageId) {
         return null;
     }
 }

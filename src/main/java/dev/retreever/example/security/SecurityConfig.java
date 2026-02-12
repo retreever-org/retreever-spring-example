@@ -17,7 +17,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("*"));       // allow everyone
+                    config.setAllowedOrigins(List.of("*", "http://localhost:5173"));       // allow everyone
                     config.setAllowedMethods(List.of("*"));       // allow all HTTP methods
                     config.setAllowedHeaders(List.of("*"));       // allow all headers
                     config.setAllowCredentials(false);            // "*" + credentials is illegal, - keep it false

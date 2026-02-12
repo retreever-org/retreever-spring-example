@@ -20,7 +20,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.UUID;
+import java.lang.Long;
 
 @ApiGroup(
         name = "Product Variant APIs",
@@ -47,7 +47,7 @@ public class ProductVariantController {
     public ResponseEntity<ApiResponse<ProductVariantResponse>> createVariant(
             @Description("ID/Primary Key of the product to which the variant should belong.")
             @PathVariable
-            UUID productId,
+            Long productId,
             @RequestBody @Valid ProductVariantRequest request
     ) {
         var response = variantService.createProductVariant(productId, request);
@@ -67,7 +67,7 @@ public class ProductVariantController {
             errors = ProductVariantNotFoundException.class
     )
     @GetMapping("/variants/{variantId}")
-    public ResponseEntity<ApiResponse<ProductVariantResponse>> getVariant(@PathVariable UUID variantId) {
+    public ResponseEntity<ApiResponse<ProductVariantResponse>> getVariant(@PathVariable Long variantId) {
         var response = variantService.getVariant(variantId);
         return ResponseEntity.ok(ApiResponse.success(
                 response.isDeleted() ? "Retrieved deleted product record." : "Product found.",
@@ -88,7 +88,7 @@ public class ProductVariantController {
     )
     @PutMapping("/variants/{variantId}")
     public ResponseEntity<ApiResponse<ProductVariantResponse>> updateVariant(
-            @PathVariable UUID variantId,
+            @PathVariable Long variantId,
             @RequestBody @Valid ProductVariantRequest request
     ) {
         var response = variantService.updateProductVariant(variantId, request);
@@ -107,7 +107,7 @@ public class ProductVariantController {
             }
     )
     @DeleteMapping("/variants/{variantId}")
-    public ResponseEntity<ApiAck> deleteVariant(@PathVariable UUID variantId) {
+    public ResponseEntity<ApiAck> deleteVariant(@PathVariable Long variantId) {
         variantService.deleteProductVariant(variantId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(ApiAck.success("Product Variant Deleted."));

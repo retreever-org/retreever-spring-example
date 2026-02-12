@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Long;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -26,7 +26,7 @@ public class ProductGalleryController {
 
     @PostMapping("/products/variants/{variantId}/images/presign")
     public ResponseEntity<ApiResponse<List<S3PresignedUpload>>> presignImageUploads(
-            @PathVariable UUID variantId,
+            @PathVariable Long variantId,
             @RequestParam("upload_count") int uploadCount,
             @RequestBody ContentType contentType
             ) {
@@ -40,7 +40,7 @@ public class ProductGalleryController {
 
     @PostMapping("/products/variants/{variantId}/images/confirm-upload")
     public ResponseEntity<ApiAck> confirmImageUploads(
-            @PathVariable UUID variantId,
+            @PathVariable Long variantId,
             @RequestParam String[] objectKeys
             ) {
         productGalleryService.confirmImageUploads(variantId, objectKeys, PRODUCT_GALLERY_DIFFERENTIATOR);
@@ -49,7 +49,7 @@ public class ProductGalleryController {
 
     @GetMapping("/public/products/variants/images/{imageId}")
     public ResponseEntity<byte[]> getImageUploads(
-            @PathVariable UUID imageId
+            @PathVariable Long imageId
             ) {
         DownloadFile file = productGalleryService.getImage(imageId);
 
@@ -65,7 +65,7 @@ public class ProductGalleryController {
 
     @DeleteMapping("/variants/images/{imageId}")
     public ResponseEntity<ApiAck> deleteImageUploads(
-            @PathVariable UUID imageId
+            @PathVariable Long imageId
             ) {
         productGalleryService.deleteImage(imageId);
         return ResponseEntity.ok(ApiAck.success("Image deleted successfully"));

@@ -5,22 +5,22 @@ import dev.retreever.example.dto.response.ProductVariantResponse;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 public class ProductVariantService {
-    public ProductVariantResponse createProductVariant(UUID productId, @Valid ProductVariantRequest request) {
+    public ProductVariantResponse createProductVariant(Long productId, @Valid ProductVariantRequest request) {
         return null;
     }
 
-    public ProductVariantResponse getVariant(UUID variantId) {
+    public ProductVariantResponse getVariant(Long variantId) {
         return null;
     }
 
-    public ProductVariantResponse updateProductVariant(UUID variantId, @Valid ProductVariantRequest request) {
+    public ProductVariantResponse updateProductVariant(Long variantId, @Valid ProductVariantRequest request) {
         return null;
     }
 
-    public void deleteProductVariant(UUID variantId) {
+    public void deleteProductVariant(Long variantId) {
     }
 }

@@ -6,11 +6,11 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 public class StoreService {
-    public UUID createStore(@Valid StoreWrite request) {
+    public Long createStore(@Valid StoreWrite request) {
         return  null;
     }
 
@@ -18,15 +18,15 @@ public class StoreService {
         return null;
     }
 
-    public StoreDetails getStoreDetails(UUID storeId) {
+    public StoreDetails getStoreDetails(Long storeId) {
         return null;
     }
 
-    public StoreDetails updateStore(UUID storeId, @Valid StoreWrite request) {
+    public StoreDetails updateStore(Long storeId, @Valid StoreWrite request) {
         return null;
     }
 
-    public void deleteStore(UUID storeId) {
+    public void deleteStore(Long storeId) {
 
     }
 }

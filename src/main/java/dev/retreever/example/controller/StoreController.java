@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.UUID;
+import java.lang.Long;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -25,7 +25,7 @@ public class StoreController {
 
     @PostMapping("/stores")
     public ResponseEntity<ApiAck> createStore(@RequestBody @Valid StoreWrite request) {
-        UUID id = storeService.createStore(request);
+        Long id = storeService.createStore(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .location(URI.create("/api/v1/public/stores/" + id))
@@ -43,7 +43,7 @@ public class StoreController {
     }
 
     @GetMapping("/public/stores/{storeId}")
-    public ResponseEntity<ApiResponse<StoreDetails>> getStoreByIDForPublic(@PathVariable UUID storeId) {
+    public ResponseEntity<ApiResponse<StoreDetails>> getStoreByIDForPublic(@PathVariable Long storeId) {
         StoreDetails storeDetails = storeService.getStoreDetails(storeId);
         return ResponseEntity.ok(ApiResponse.success(
                 "Store Found",
@@ -52,7 +52,7 @@ public class StoreController {
     }
 
     @GetMapping("/stores/{storeId}")
-    public ResponseEntity<ApiResponse<StoreDetails>> getStoreByID(@PathVariable UUID storeId) {
+    public ResponseEntity<ApiResponse<StoreDetails>> getStoreByID(@PathVariable Long storeId) {
         StoreDetails storeDetails = storeService.getStoreDetails(storeId);
         return ResponseEntity.ok(ApiResponse.success(
                 "Store Found",
@@ -62,7 +62,7 @@ public class StoreController {
 
     @PutMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponse<StoreDetails>> updateStore(
-            @PathVariable UUID storeId,
+            @PathVariable Long storeId,
             @RequestBody @Valid StoreWrite request
     ) {
         StoreDetails storeDetails = storeService.updateStore(storeId, request);
@@ -73,7 +73,7 @@ public class StoreController {
     }
 
     @DeleteMapping("/stores/{storeId}")
-    public ResponseEntity<ApiAck> deleteStore(@PathVariable UUID storeId) {
+    public ResponseEntity<ApiAck> deleteStore(@PathVariable Long storeId) {
         storeService.deleteStore(storeId);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

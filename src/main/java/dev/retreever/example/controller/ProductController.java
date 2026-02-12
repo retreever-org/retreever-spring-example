@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
+import java.lang.Long;
 
 @Slf4j
 @RestController
@@ -30,11 +30,11 @@ public class ProductController {
 
     @PostMapping("/stores/{storeId}/categories/{categoryId}/products")
     public ResponseEntity<ApiAck> createProduct(
-            @PathVariable UUID storeId,
-            @PathVariable UUID categoryId,
+            @PathVariable Long storeId,
+            @PathVariable Long categoryId,
             @RequestBody @Valid ProductRequest request
     ) {
-        UUID id = productService.createProduct(storeId, categoryId, request);
+        Long id = productService.createProduct(storeId, categoryId, request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .location(URI.create("/api/v1/public/products/" + id))
@@ -42,7 +42,7 @@ public class ProductController {
     }
 
     @GetMapping("/public/products/{productId}")
-    public ResponseEntity<ApiResponse<ProductResponse>> getProductForPublic(@PathVariable UUID productId) {
+    public ResponseEntity<ApiResponse<ProductResponse>> getProductForPublic(@PathVariable Long productId) {
         ProductResponse response = productService.getProduct(productId);
         return ResponseEntity.ok(ApiResponse.success(
                 "Product Found",
@@ -51,13 +51,13 @@ public class ProductController {
     }
 
     @PostMapping("/products/{productId}/publish")
-    public ResponseEntity<ApiAck> publishProduct(@PathVariable UUID productId) {
+    public ResponseEntity<ApiAck> publishProduct(@PathVariable Long productId) {
         productService.publishProduct(productId);
         return ResponseEntity.ok(ApiAck.success("Product Published."));
     }
 
     @GetMapping("/products/{productId}")
-    public ResponseEntity<ApiResponse<ProductResponse>> getProduct(@PathVariable UUID productId) {
+    public ResponseEntity<ApiResponse<ProductResponse>> getProduct(@PathVariable Long productId) {
         ProductResponse response = productService.getProduct(productId);
         return ResponseEntity.ok(ApiResponse.success(
                 "Product Found",
@@ -81,7 +81,7 @@ public class ProductController {
 
     @PutMapping("/products/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
-            @PathVariable UUID productId,
+            @PathVariable Long productId,
             @RequestBody @Valid ProductRequest request
     ) {
         ProductResponse response = productService.updateProduct(productId, request);
@@ -92,7 +92,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{productId}")
-    public ResponseEntity<ApiAck> deleteProduct(@PathVariable UUID productId) {
+    public ResponseEntity<ApiAck> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(ApiAck.success("Product Deleted."));
@@ -105,7 +105,7 @@ public class ProductController {
 
     @GetMapping("/stores/{storeId}/products")
     public ResponseEntity<PageResponse<ProductResponse>> getProductsByStore(
-            @PathVariable UUID storeId,
+            @PathVariable Long storeId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size) {
         log.debug("Fetching products by store: {}", storeId);

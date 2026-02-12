@@ -4,20 +4,20 @@ import dev.retreever.example.dto.request.AddCartItemRequest;
 import dev.retreever.example.dto.response.CartResponse;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 public class CartService {
     public void createCart() {
     }
 
-    public void addItemToCart(UUID cartId, AddCartItemRequest request) {
+    public void addItemToCart(Long cartId, AddCartItemRequest request) {
     }
 
-    public void removeCartItem(UUID itemId) {
+    public void removeCartItem(Long itemId) {
     }
 
-    public CartResponse getCart(UUID cartId) {
+    public CartResponse getCart(Long cartId) {
         return null;
     }
 }

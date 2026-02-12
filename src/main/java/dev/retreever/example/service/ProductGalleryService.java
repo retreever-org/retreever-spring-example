@@ -6,21 +6,21 @@ import dev.retreever.example.dto.shared.S3PresignedUpload;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 public class ProductGalleryService {
-    public List<S3PresignedUpload> presignImageUploads(UUID variantId, int uploadCount, ContentType contentType, String productGalleryDifferentiator) {
+    public List<S3PresignedUpload> presignImageUploads(Long variantId, int uploadCount, ContentType contentType, String productGalleryDifferentiator) {
         return null;
     }
 
-    public void confirmImageUploads(UUID variantId, String[] objectKeys, String productGalleryDifferentiator) {
+    public void confirmImageUploads(Long variantId, String[] objectKeys, String productGalleryDifferentiator) {
     }
 
-    public DownloadFile getImage(UUID imageId) {
+    public DownloadFile getImage(Long imageId) {
         return null;
     }
 
-    public void deleteImage(UUID imageId) {
+    public void deleteImage(Long imageId) {
     }
 }

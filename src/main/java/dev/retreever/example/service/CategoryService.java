@@ -9,15 +9,15 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 public class CategoryService {
-    public UUID createCategory(@Valid CategoryCreateRequest request, UUID parentId) {
+    public Long createCategory(@Valid CategoryCreateRequest request, Long parentId) {
         return null;
     }
 
-    public CategorySummary getCategory(UUID categoryId) {
+    public CategorySummary getCategory(Long categoryId) {
         return null;
     }
 
@@ -29,15 +29,15 @@ public class CategoryService {
         return null;
     }
 
-    public CategorySummary updateCategory(UUID categoryId, @Valid CategoryUpdateRequest request) {
+    public CategorySummary updateCategory(Long categoryId, @Valid CategoryUpdateRequest request) {
         return null;
     }
 
-    public CategorySummary updateCategoryStatus(UUID categoryId, CategoryStatus categoryStatus) {
+    public CategorySummary updateCategoryStatus(Long categoryId, CategoryStatus categoryStatus) {
         return null;
     }
 
-    public CategorySummary updateCategoryParent(UUID categoryId, UUID parentId) {
+    public CategorySummary updateCategoryParent(Long categoryId, Long parentId) {
         return null;
     }
 }
