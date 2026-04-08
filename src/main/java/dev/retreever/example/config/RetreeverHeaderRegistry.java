@@ -20,6 +20,6 @@ public class RetreeverHeaderRegistry {
     ApiHeader deviceHeader() {
         return new ApiHeader()
                 .setName("X-Device-ID").setRequired(true).setType(JsonPropertyType.STRING)
-                .setDescription("Authorization header for API requests");
+                .setDescription("Mock device fingerprint header used to bind tokens to a simulated client device");
     }
 }

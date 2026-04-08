@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,13 +37,14 @@ public class ProductVariantController {
             name = "Create Product Variant",
             description = "Create a new product variant",
             secured = true,
-            headers = HttpHeaders.AUTHORIZATION,
+            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"},
             errors = {
                     AccessDeniedException.class,
                     ProductNotFoundException.class,
                     MethodArgumentNotValidException.class
             }
     )
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/products/{productId}/variants")
     public ResponseEntity<ApiResponse<ProductVariantResponse>> createVariant(
             @Description("ID/Primary Key of the product to which the variant should belong.")
@@ -64,8 +66,11 @@ public class ProductVariantController {
     @ApiEndpoint(
             name = "Get Product Variant",
             description = "Get a product variant by its ID",
+            secured = true,
+            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"},
             errors = ProductVariantNotFoundException.class
     )
+    @PreAuthorize("hasAnyAuthority('customer','seller','admin')")
     @GetMapping("/variants/{variantId}")
     public ResponseEntity<ApiResponse<ProductVariantResponse>> getVariant(@PathVariable Long variantId) {
         var response = variantService.getVariant(variantId);
@@ -79,13 +84,14 @@ public class ProductVariantController {
             name = "Update Product Variant",
             description = "Update an existing product variant by ID",
             secured = true,
-            headers = HttpHeaders.AUTHORIZATION,
+            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"},
             errors = {
                     AccessDeniedException.class,
                     ProductVariantNotFoundException.class,
                     MethodArgumentNotValidException.class
             }
     )
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PutMapping("/variants/{variantId}")
     public ResponseEntity<ApiResponse<ProductVariantResponse>> updateVariant(
             @PathVariable Long variantId,
@@ -99,13 +105,14 @@ public class ProductVariantController {
             name = "Delete Product Variant",
             description = "Delete an existing product variant by ID",
             secured = true,
-            headers = HttpHeaders.AUTHORIZATION,
+            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"},
             errors = {
                     AccessDeniedException.class,
                     ProductVariantNotFoundException.class,
                     ProductNotFoundException.class
             }
     )
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @DeleteMapping("/variants/{variantId}")
     public ResponseEntity<ApiAck> deleteVariant(@PathVariable Long variantId) {
         variantService.deleteProductVariant(variantId);

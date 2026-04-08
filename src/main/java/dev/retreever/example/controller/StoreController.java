@@ -23,6 +23,7 @@ public class StoreController {
 
     private final StoreService storeService;
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/stores")
     public ResponseEntity<ApiAck> createStore(@RequestBody @Valid StoreWrite request) {
         Long id = storeService.createStore(request);
@@ -51,6 +52,7 @@ public class StoreController {
         ));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @GetMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponse<StoreDetails>> getStoreByID(@PathVariable Long storeId) {
         StoreDetails storeDetails = storeService.getStoreDetails(storeId);
@@ -60,6 +62,7 @@ public class StoreController {
         ));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PutMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponse<StoreDetails>> updateStore(
             @PathVariable Long storeId,
@@ -72,6 +75,7 @@ public class StoreController {
         ));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @DeleteMapping("/stores/{storeId}")
     public ResponseEntity<ApiAck> deleteStore(@PathVariable Long storeId) {
         storeService.deleteStore(storeId);

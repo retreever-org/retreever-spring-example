@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -28,6 +29,7 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/stores/{storeId}/categories/{categoryId}/products")
     public ResponseEntity<ApiAck> createProduct(
             @PathVariable Long storeId,
@@ -50,12 +52,14 @@ public class ProductController {
         ));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/products/{productId}/publish")
     public ResponseEntity<ApiAck> publishProduct(@PathVariable Long productId) {
         productService.publishProduct(productId);
         return ResponseEntity.ok(ApiAck.success("Product Published."));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @GetMapping("/products/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> getProduct(@PathVariable Long productId) {
         ProductResponse response = productService.getProduct(productId);
@@ -79,6 +83,7 @@ public class ProductController {
     }
 
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PutMapping("/products/{productId}")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @PathVariable Long productId,
@@ -91,6 +96,7 @@ public class ProductController {
         ));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @DeleteMapping("/products/{productId}")
     public ResponseEntity<ApiAck> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
@@ -103,6 +109,7 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success("Brands Found", productService.getBrands()));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @GetMapping("/stores/{storeId}/products")
     public ResponseEntity<PageResponse<ProductResponse>> getProductsByStore(
             @PathVariable Long storeId,

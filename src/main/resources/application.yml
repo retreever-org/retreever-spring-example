@@ -18,7 +18,7 @@ retreever:
         source:
           request:
             endpoints:
-              - /api/v1/public/login/login
+              - /api/v1/public/login
               - /api/v1/public/login/refresh
             method: post
             response:
@@ -28,8 +28,12 @@ retreever:
         source:
           request:
             endpoints:
-            - /api/v1/public/login/login
+            - /api/v1/public/login
             - /api/v1/public/login/refresh
             method: post
             response:
               body-attribute-path: data.refresh_token
+
+      - name: device-id
+        source:
+          value: device-web-001

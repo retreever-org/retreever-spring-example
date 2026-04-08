@@ -10,7 +10,7 @@ public record RefreshRequest(
         @NotBlank(message = "Refresh Token cannot be blank")
         @NotNull(message = "Refresh Token cannot be null")
         @Pattern(
-                regexp = "^[A-Za-z0-9_-]+\\.([A-Za-z0-9_-]+)\\.[A-Za-z0-9_-]+$\n",
+                regexp = "^[A-Za-z0-9_-]+\\.([A-Za-z0-9_-]+)\\.[A-Za-z0-9_-]+$",
                 message = "Invalid JWT Format"
         )
         @FieldInfo(description = "Refresh Token")

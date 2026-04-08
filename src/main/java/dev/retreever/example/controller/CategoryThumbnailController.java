@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.Long;
@@ -26,6 +27,7 @@ public class CategoryThumbnailController {
     /**
      * Generates a presigned URL for uploading a new category thumbnail.
      */
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/categories/thumbnail/presign-upload")
     public ResponseEntity<ApiResponse<S3PresignedUpload>> presignThumbnailUpload(@RequestBody ContentType contentType) {
         contentType.mustStartWith("image/");
@@ -39,6 +41,7 @@ public class CategoryThumbnailController {
     /**
      * Confirms a successful thumbnail upload and updates the category reference.
      */
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/categories/{categoryId}/thumbnail/confirm-upload")
     public ResponseEntity<ApiAck> confirmThumbnailUpload(
             @PathVariable Long categoryId,

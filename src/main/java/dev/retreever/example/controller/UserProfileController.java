@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -42,7 +43,7 @@ public class UserProfileController {
      * Public endpoint - no authentication required.
      */
     @PostMapping("/public/users/register")
-    public ResponseEntity<ApiAck> registerUser(@Valid UserCredentials request) {
+    public ResponseEntity<ApiAck> registerUser(@Valid @ModelAttribute UserCredentials request) {
         log.debug("User registration request received for email: {}", request.email());
         userProfileService.registerNewUser(request);
 
@@ -57,9 +58,12 @@ public class UserProfileController {
      */
     @PutMapping("/users/profile")
     @PreAuthorize("hasAuthority('customer')")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(@Valid UpdateUserProfileRequest request) {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(
+            Authentication authentication,
+            @Valid @ModelAttribute UpdateUserProfileRequest request
+    ) {
         log.debug("Update profile request received");
-        UserProfileResponse response = userProfileService.updateProfile(request);
+        UserProfileResponse response = userProfileService.updateProfile(authentication, request);
 
         return ResponseEntity
                 .ok(ApiResponse.success("Profile updated successfully", response));
@@ -70,10 +74,11 @@ public class UserProfileController {
      * Requires authentication.
      */
     @GetMapping("/users/profile")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> getCurrentProfile() {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> getCurrentProfile(Authentication authentication) {
         log.debug("Get current profile request received");
 
-        UserProfileResponse response = userProfileService.getUserProfile();
+        UserProfileResponse response = userProfileService.getUserProfile(authentication);
         return ResponseEntity.ok(ApiResponse.success(
                 "Profile fetched successfully",
                 response
@@ -88,10 +93,10 @@ public class UserProfileController {
      */
     @PostMapping("/sellers/profile")
     @PreAuthorize("hasAuthority('customer')")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> createSellerProfile() {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> createSellerProfile(Authentication authentication) {
         log.debug("Creating seller profile");
 
-        UserProfileResponse response = userProfileService.createSellerProfile();
+        UserProfileResponse response = userProfileService.createSellerProfile(authentication);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/api/v1/users/profile"))
                 .body(ApiResponse.success(
@@ -109,10 +114,13 @@ public class UserProfileController {
      */
     @PutMapping("/sellers/profile")
     @PreAuthorize("hasAuthority('seller')")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> updateSellerProfile(@RequestBody @Valid SellerEditRequest request) {
+    public ResponseEntity<ApiResponse<UserProfileResponse>> updateSellerProfile(
+            Authentication authentication,
+            @RequestBody @Valid SellerEditRequest request
+    ) {
         log.debug("Updating seller profile");
 
-        UserProfileResponse response = userProfileService.updateSellerProfile(request);
+        UserProfileResponse response = userProfileService.updateSellerProfile(authentication, request);
         return ResponseEntity
                 .ok(ApiResponse.success(
                         "Seller Profile Updated Successfully",
@@ -121,7 +129,6 @@ public class UserProfileController {
     }
 
     @PostMapping("/admins/register")
-    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<ApiAck> registerAdmin(@Valid @RequestBody UserCredentials credentials) {
         log.debug("Creating new Admin");
 

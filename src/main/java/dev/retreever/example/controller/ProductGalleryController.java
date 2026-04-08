@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class ProductGalleryController {
 
     private final ProductGalleryService productGalleryService;
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/products/variants/{variantId}/images/presign")
     public ResponseEntity<ApiResponse<List<S3PresignedUpload>>> presignImageUploads(
             @PathVariable Long variantId,
@@ -38,6 +40,7 @@ public class ProductGalleryController {
         ));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/products/variants/{variantId}/images/confirm-upload")
     public ResponseEntity<ApiAck> confirmImageUploads(
             @PathVariable Long variantId,
@@ -63,6 +66,7 @@ public class ProductGalleryController {
                 .body(file.bytes());
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @DeleteMapping("/variants/images/{imageId}")
     public ResponseEntity<ApiAck> deleteImageUploads(
             @PathVariable Long imageId

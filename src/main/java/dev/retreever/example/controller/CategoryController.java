@@ -11,6 +11,7 @@ import dev.retreever.example.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -25,6 +26,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/categories")
     public ResponseEntity<ApiAck> createCategory(
             @Valid @RequestBody CategoryCreateRequest request,
@@ -36,6 +38,7 @@ public class CategoryController {
                 .body(ApiAck.success("Category Created"));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @GetMapping("/categories/{categoryId}")
     public ResponseEntity<ApiResponse<CategorySummary>> getCategory(
             @PathVariable Long categoryId
@@ -50,12 +53,14 @@ public class CategoryController {
         return ResponseEntity.ok(ApiResponse.success("Category Catalogue Retrieved", catalogue));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @GetMapping("/categories")
     public ResponseEntity<ApiResponse<List<CategoryDetail>>> getCategoriesOfAllStatus() {
         List<CategoryDetail> catalogue = categoryService.getCategoriesOfAllStatus();
         return ResponseEntity.ok(ApiResponse.success("Category Catalogue Retrieved", catalogue));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PutMapping("/categories/{categoryId}")
     public ResponseEntity<ApiResponse<CategorySummary>> updateCategory(
             @PathVariable Long categoryId,
@@ -65,6 +70,7 @@ public class CategoryController {
         return ResponseEntity.ok(ApiResponse.success("Category Updated", summary));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PatchMapping("/categories/{categoryId}/status")
     public ResponseEntity<ApiResponse<CategorySummary>> updateCategoryStatus(
             @PathVariable Long categoryId,
@@ -74,6 +80,7 @@ public class CategoryController {
         return ResponseEntity.ok(ApiResponse.success("Category Summary Updated", summary));
     }
 
+    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PatchMapping("/categories/{categoryId}/parent")
     public ResponseEntity<ApiResponse<CategorySummary>> updateCategoryParent(
             @PathVariable Long categoryId,
