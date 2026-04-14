@@ -11,6 +11,10 @@ server:
 
 # Retreever Environment Configuration
 retreever:
+  allow-cross-origin: http://localhost:5173
+  auth:
+    username: Admin
+    password: Admin@123
   env:
     variables:
 
