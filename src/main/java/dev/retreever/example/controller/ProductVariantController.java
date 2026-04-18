@@ -44,7 +44,6 @@ public class ProductVariantController {
                     MethodArgumentNotValidException.class
             }
     )
-//    @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/products/{productId}/variants")
     public ResponseEntity<ApiResponse<ProductVariantResponse>> createVariant(
             @Description("ID/Primary Key of the product to which the variant should belong.")

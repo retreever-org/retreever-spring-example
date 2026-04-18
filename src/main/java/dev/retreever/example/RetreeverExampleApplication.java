@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @ApiDoc(
-        name = "Quickcart E-Commerce API",
+        name = "E-Commerce API",
         description = "A Demo Application to demonstrate the working of Retreever"
 )
 @SpringBootApplication
