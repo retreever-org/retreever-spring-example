@@ -30,6 +30,7 @@ public class AuthController {
             @RequestHeader(name = "X-Device-ID", required = false) String deviceId,
             @Valid @ModelAttribute UserCredentials userCredentials
     ) {
+        System.out.println(userCredentials.toString());
         AuthResponse response = authService.loginUser(userCredentials, deviceId);
         return ResponseEntity
                 .ok()

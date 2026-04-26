@@ -10,16 +10,17 @@ import dev.retreever.example.exception.scenario.ScenarioNotFoundException;
 import dev.retreever.example.exception.scenario.ScenarioUnauthorizedException;
 import dev.retreever.example.security.MockAuthenticatedUser;
 import dev.retreever.example.service.ScenarioResponseService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -27,7 +28,7 @@ import java.net.URI;
         name = "Response Lab APIs",
         description = "Dedicated endpoints for exercising varied status codes, payload shapes, and security outcomes."
 )
-@RestController
+@Controller
 @RequestMapping("/api/v1/scenarios")
 @RequiredArgsConstructor
 public class ResponseLabController {
@@ -39,6 +40,7 @@ public class ResponseLabController {
             description = "Returns a standard 200 JSON payload for baseline success-path verification."
     )
     @GetMapping("/public/ok")
+    @ResponseBody
     public ResponseEntity<ScenarioPayloads.SuccessPayload> getSuccessScenario() {
         return ResponseEntity.ok(responseService.successPayload());
     }
@@ -49,6 +51,7 @@ public class ResponseLabController {
             status = HttpStatus.CREATED
     )
     @GetMapping("/public/created")
+    @ResponseBody
     public ResponseEntity<ScenarioPayloads.CreatedPayload> getCreatedScenario() {
         ScenarioPayloads.CreatedPayload payload = responseService.createdPayload();
         return ResponseEntity.created(URI.create(payload.location())).body(payload);
@@ -60,6 +63,7 @@ public class ResponseLabController {
             status = HttpStatus.ACCEPTED
     )
     @GetMapping("/public/accepted")
+    @ResponseBody
     public ResponseEntity<ScenarioPayloads.AcceptedPayload> getAcceptedScenario() {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(responseService.acceptedPayload());
     }
@@ -70,6 +74,7 @@ public class ResponseLabController {
             status = HttpStatus.FOUND
     )
     @GetMapping("/public/redirect")
+    @ResponseBody
     public ResponseEntity<ScenarioPayloads.RedirectPayload> getRedirectScenario() {
         ScenarioPayloads.RedirectPayload payload = responseService.redirectPayload();
         return ResponseEntity.status(HttpStatus.FOUND)
@@ -81,6 +86,7 @@ public class ResponseLabController {
             name = "HTML Showcase",
             description = "Returns a browser-friendly HTML document with inline CSS so non-JSON response rendering can be tested."
     )
+    @ResponseBody
     @GetMapping(value = "/public/html-showcase", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> getHtmlShowcase() {
         return ResponseEntity.ok()
@@ -256,6 +262,7 @@ public class ResponseLabController {
             description = "Returns an application/xml document so XML parsers and content negotiation paths can be verified."
     )
     @GetMapping(value = "/public/xml-showcase", produces = MediaType.APPLICATION_XML_VALUE)
+    @ResponseBody
     public ResponseEntity<String> getXmlShowcase() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_XML)
@@ -285,6 +292,7 @@ public class ResponseLabController {
             errors = ScenarioBadRequestException.class
     )
     @GetMapping("/public/bad-request")
+    @ResponseBody
     public ResponseEntity<Void> getBadRequestScenario() {
         throw new ScenarioBadRequestException("The supplied scenario parameters are intentionally invalid.");
     }
@@ -295,6 +303,7 @@ public class ResponseLabController {
             errors = ScenarioUnauthorizedException.class
     )
     @GetMapping("/public/unauthorized")
+    @ResponseBody
     public ResponseEntity<Void> getUnauthorizedScenario() {
         throw new ScenarioUnauthorizedException("This scenario simulates a failed authentication exchange.");
     }
@@ -305,6 +314,7 @@ public class ResponseLabController {
             errors = ScenarioForbiddenException.class
     )
     @GetMapping("/public/forbidden")
+    @ResponseBody
     public ResponseEntity<Void> getForbiddenScenario() {
         throw new ScenarioForbiddenException("This scenario simulates a caller lacking the required authority.");
     }
@@ -315,6 +325,7 @@ public class ResponseLabController {
             errors = ScenarioNotFoundException.class
     )
     @GetMapping("/public/not-found")
+    @ResponseBody
     public ResponseEntity<Void> getNotFoundScenario() {
         throw new ScenarioNotFoundException("resource=" + URI.create("/api/v1/scenarios/public/not-found"));
     }
@@ -325,6 +336,7 @@ public class ResponseLabController {
             errors = ScenarioInternalServerException.class
     )
     @GetMapping("/public/server-error")
+    @ResponseBody
     public ResponseEntity<Void> getInternalErrorScenario() {
         throw new ScenarioInternalServerException("Synthetic server error raised to validate 500-response handling.");
     }
@@ -350,8 +362,27 @@ public class ResponseLabController {
     )
     @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/secure/admin-only")
+    @ResponseBody
     public ResponseEntity<ScenarioPayloads.SecureEcho> getAdminOnlyEcho(Authentication authentication) {
         MockAuthenticatedUser principal = (MockAuthenticatedUser) authentication.getPrincipal();
         return ResponseEntity.ok(responseService.secureEcho(principal));
+    }
+
+    @GetMapping("/hello-world") // This API should not be resolved as it is not annotated with @ResponseBody
+    public ResponseEntity<String> helloWorld() {
+        return ResponseEntity.status(HttpStatus.OK).body("Hello World");
+    }
+
+    @Getter
+    @Setter
+    public static class TestDecapitalization {
+        private String OTP;
+        private String Pin;
+    }
+
+    @PostMapping("/decaptalization")
+    @ResponseBody
+    public ResponseEntity<TestDecapitalization> testDecapitalization(TestDecapitalization testDecapitalization) {
+        return ResponseEntity.ok(testDecapitalization);
     }
 }

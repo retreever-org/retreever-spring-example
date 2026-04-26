@@ -1,13 +1,13 @@
 spring:
   application:
     name: retreever-example
-#retreever.enabled=false
-#logging.level.dev.retreever.schema.resolver=DEBUG
-#logging.level.dev.retreever.engine.SchemaResolutionOrchestrator=DEBUG
-#logging.level.dev.retreever.view.ApiDocumentAssembler=DEBUG
-#logging.level.dev.retreever.repo.ApiErrorRegistry=DEBUG
+
 server:
   port: 9000
+
+logging:
+  level:
+    org.springframework.security: DEBUG
 
 # Retreever Environment Configuration
 retreever:

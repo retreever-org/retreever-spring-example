@@ -79,7 +79,7 @@ public class ApplicationExceptionHandler {
             status = HttpStatus.FORBIDDEN,
             description = "Access Denied"
     )
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler
     public ResponseEntity<ApiErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ApiErrorResponse.build("Access Denied", ex.getMessage()));
