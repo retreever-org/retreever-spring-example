@@ -27,6 +27,7 @@ public class CategoryThumbnailController {
     /**
      * Generates a presigned URL for uploading a new category thumbnail.
      */
+    @Deprecated
     @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PostMapping("/categories/thumbnail/presign-upload")
     public ResponseEntity<ApiResponse<S3PresignedUpload>> presignThumbnailUpload(@RequestBody ContentType contentType) {

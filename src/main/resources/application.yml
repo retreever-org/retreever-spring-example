@@ -7,16 +7,21 @@ server:
 
 logging:
   level:
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
 
 # Retreever Environment Configuration
 retreever:
+  enabled: true
   dev:
     allow-cross-origin:
       - http://localhost:5173
+  studio:
+    storage: indexed-db
+  security:
+    hint-log: false
   auth:
-    username: Admin
-    password: Admin@123
+#    username: Admin # can be in .env
+#    password: Admin@123 # can be in .env
   env:
     variables:
 

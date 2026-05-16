@@ -70,6 +70,7 @@ public class CategoryController {
         return ResponseEntity.ok(ApiResponse.success("Category Updated", summary));
     }
 
+    @Deprecated
     @PreAuthorize("hasAnyAuthority('seller','admin')")
     @PatchMapping("/categories/{categoryId}/status")
     public ResponseEntity<ApiResponse<CategorySummary>> updateCategoryStatus(
