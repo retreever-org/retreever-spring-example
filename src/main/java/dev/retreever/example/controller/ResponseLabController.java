@@ -13,7 +13,6 @@ import dev.retreever.example.service.ScenarioResponseService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -344,8 +343,7 @@ public class ResponseLabController {
     @ApiEndpoint(
             name = "Secure Echo",
             description = "Requires any authenticated caller and echoes the resolved mock security context.",
-            secured = true,
-            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"}
+            secured = true
     )
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/secure/echo")
@@ -357,8 +355,7 @@ public class ResponseLabController {
     @ApiEndpoint(
             name = "Admin Only Echo",
             description = "Requires the admin authority and can be used to exercise real 401/403 security failures.",
-            secured = true,
-            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"}
+            secured = true
     )
     @PreAuthorize("hasAuthority('admin')")
     @GetMapping("/secure/admin-only")

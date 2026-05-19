@@ -12,16 +12,19 @@ logging:
 # Retreever Environment Configuration
 retreever:
   enabled: true
+  example:
+    frame-ancestors: ${RETREEVER_FRAME_ANCESTORS:}
   dev:
-    allow-cross-origin:
-      - http://localhost:5173
+    allow-cross-origin: ${RETREEVER_DEV_ALLOW_CROSS_ORIGIN:}
   studio:
     storage: indexed-db
   security:
     hint-log: false
   auth:
-#    username: Admin # can be in .env
-#    password: Admin@123 # can be in .env
+    username: ${RETREEVER_AUTH_USERNAME:}
+    password: ${RETREEVER_AUTH_PASSWORD:}
+
+# Environment Variable Automation
   env:
     variables:
 
@@ -44,7 +47,3 @@ retreever:
             method: post
             response:
               body-attribute-path: data.refresh_token
-
-      - name: device-id
-        source:
-          value: device-web-001

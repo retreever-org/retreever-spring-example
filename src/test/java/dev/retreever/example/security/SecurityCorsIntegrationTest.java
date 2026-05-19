@@ -21,7 +21,7 @@ class SecurityCorsIntegrationTest {
     private int port;
 
     @Test
-    void retreeverPingIncludesCorsHeadersForUnauthorizedDevRequests() throws Exception {
+    void retreeverPingIncludesCorsHeadersForPublicDevRequests() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/retreever/ping"))
                 .header("Origin", DEV_ORIGIN)
@@ -30,8 +30,21 @@ class SecurityCorsIntegrationTest {
 
         HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
-        assertEquals(401, response.statusCode());
+        assertEquals(200, response.statusCode());
         assertEquals(DEV_ORIGIN, response.headers().firstValue("Access-Control-Allow-Origin").orElse(null));
         assertEquals("true", response.headers().firstValue("Access-Control-Allow-Credentials").orElse(null));
+    }
+
+    @Test
+    void rootServesRetreeverWithoutRedirect() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(200, response.statusCode());
+        assertEquals("http://localhost:" + port + "/", response.uri().toString());
     }
 }

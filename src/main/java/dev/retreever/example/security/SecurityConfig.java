@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -103,6 +104,18 @@ public class SecurityConfig {
     }
 
     @Bean
+    public FilterRegistrationBean<RetreeverDemoFrameAncestorsFilter> retreeverDemoFrameAncestorsFilterRegistration(
+            @Value("${retreever.example.frame-ancestors:}") String frameAncestors
+    ) {
+        FilterRegistrationBean<RetreeverDemoFrameAncestorsFilter> registration =
+                new FilterRegistrationBean<>(new RetreeverDemoFrameAncestorsFilter(frameAncestors));
+        registration.setName("retreeverDemoFrameAncestorsFilter");
+        registration.addUrlPatterns("/", "/retreever", "/retreever/*");
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 30);
+        return registration;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
             MockBearerAuthenticationFilter authenticationFilter,
@@ -121,6 +134,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/index.html").permitAll()
                         .requestMatchers(RetreeverPublicPaths.get()).permitAll()
                         .requestMatchers("/retreever/**", "/error").permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()

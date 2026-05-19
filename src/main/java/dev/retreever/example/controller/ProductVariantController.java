@@ -12,7 +12,6 @@ import dev.retreever.example.exception.ProductVariantNotFoundException;
 import dev.retreever.example.service.ProductVariantService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -37,7 +36,6 @@ public class ProductVariantController {
             name = "Create Product Variant",
             description = "Create a new product variant",
             secured = true,
-            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"},
             errors = {
                     AccessDeniedException.class,
                     ProductNotFoundException.class,
@@ -66,7 +64,6 @@ public class ProductVariantController {
             name = "Get Product Variant",
             description = "Get a product variant by its ID",
             secured = true,
-            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"},
             errors = ProductVariantNotFoundException.class
     )
     @PreAuthorize("hasAnyAuthority('customer','seller','admin')")
@@ -83,7 +80,6 @@ public class ProductVariantController {
             name = "Update Product Variant",
             description = "Update an existing product variant by ID",
             secured = true,
-            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"},
             errors = {
                     AccessDeniedException.class,
                     ProductVariantNotFoundException.class,
@@ -104,7 +100,6 @@ public class ProductVariantController {
             name = "Delete Product Variant",
             description = "Delete an existing product variant by ID",
             secured = true,
-            headers = {HttpHeaders.AUTHORIZATION, "X-Device-ID"},
             errors = {
                     AccessDeniedException.class,
                     ProductVariantNotFoundException.class,

@@ -8,6 +8,8 @@ import dev.retreever.example.dto.request.RefreshRequest;
 import dev.retreever.example.dto.request.UserCredentials;
 import dev.retreever.example.service.AuthService;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,36 +29,37 @@ public class AuthController {
 
     @PostMapping(value = "/public/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<AuthResponse>> loginUser(
-            @RequestHeader(name = "X-Device-ID", required = false) String deviceId,
-            @Valid @ModelAttribute UserCredentials userCredentials
+            @Valid @ModelAttribute UserCredentials userCredentials,
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
         System.out.println(userCredentials.toString());
-        AuthResponse response = authService.loginUser(userCredentials, deviceId);
+        AuthResponse authResponse = authService.loginUser(userCredentials, request, response);
         return ResponseEntity
                 .ok()
                 .body(ApiResponse.success(
                         "login successful",
-                        response
+                        authResponse
                 ));
     }
 
     @PostMapping(value = "/public/login/refresh", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<AuthResponse>> refreshLogin(
-            @RequestHeader(name = "X-Device-ID", required = false) String deviceId,
-            @Valid @RequestBody RefreshRequest request
+            @Valid @RequestBody RefreshRequest refreshRequest,
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
-        AuthResponse response = authService.refreshLogin(request.refreshToken(), deviceId);
+        AuthResponse authResponse = authService.refreshLogin(refreshRequest.refreshToken(), request, response);
         return ResponseEntity
                 .ok()
                 .body(ApiResponse.success(
                         "login successful",
-                        response
+                        authResponse
                 ));
     }
 
     @PostMapping(value = "/public/logout", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiAck> logoutUser(
-            @RequestHeader(name = "X-Device-ID", required = false) String deviceId,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader,
             @Valid @RequestBody LogoutRequest request
     ) {
@@ -64,7 +67,7 @@ public class AuthController {
         authService.logoutUser(request.refreshToken(), accessToken);
         return ResponseEntity.ok(ApiAck.success(
                 "Logout Successful.",
-                deviceId == null || deviceId.isBlank() ? authorizationHeader : deviceId
+                authorizationHeader
         ));
     }
 

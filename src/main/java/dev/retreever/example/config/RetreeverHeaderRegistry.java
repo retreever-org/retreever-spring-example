@@ -15,11 +15,4 @@ public class RetreeverHeaderRegistry {
                 .setName(HttpHeaders.AUTHORIZATION).setRequired(true).setType(JsonPropertyType.STRING)
                 .setDescription("Authorization header for API requests");
     }
-
-    @Bean
-    ApiHeader deviceHeader() {
-        return new ApiHeader()
-                .setName("X-Device-ID").setRequired(true).setType(JsonPropertyType.STRING)
-                .setDescription("Mock device fingerprint header used to bind tokens to a simulated client device");
-    }
 }

@@ -21,17 +21,18 @@ import java.io.IOException;
 @Component
 public class MockBearerAuthenticationFilter extends OncePerRequestFilter {
 
-    public static final String DEVICE_HEADER = "X-Device-ID";
-
     private final MockIdentityService identityService;
     private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final MockDeviceCookieService deviceCookieService;
 
     public MockBearerAuthenticationFilter(
             MockIdentityService identityService,
-            AuthenticationEntryPoint authenticationEntryPoint
+            AuthenticationEntryPoint authenticationEntryPoint,
+            MockDeviceCookieService deviceCookieService
     ) {
         this.identityService = identityService;
         this.authenticationEntryPoint = authenticationEntryPoint;
+        this.deviceCookieService = deviceCookieService;
     }
 
     @Override
@@ -52,18 +53,19 @@ public class MockBearerAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String deviceId = request.getHeader(DEVICE_HEADER);
+        String deviceId = deviceCookieService.getDeviceId(request);
         if (deviceId == null || deviceId.isBlank()) {
             authenticationEntryPoint.commence(
                     request,
                     response,
-                    new InsufficientAuthenticationException("X-Device-ID header is required for authenticated requests.")
+                    new InsufficientAuthenticationException("Device cookie is required for authenticated requests.")
             );
             return;
         }
 
         try {
             MockAuthenticatedUser user = identityService.authenticate(authorizationHeader, deviceId);
+            deviceCookieService.refreshDeviceCookie(request, response, deviceId);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     user,
                     authorizationHeader,

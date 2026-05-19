@@ -21,19 +21,21 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
 public class MockIdentityService {
 
     private static final Duration ACCESS_TTL = Duration.ofMinutes(15);
     private static final Duration REFRESH_TTL = Duration.ofDays(7);
-    private static final String DEFAULT_DEVICE_ID = "device-web-001";
+    private static final Duration DEVICE_IDLE_TTL = Duration.ofHours(12);
 
     private final PasswordEncoder passwordEncoder;
     private final Map<String, MockAccount> accounts = new ConcurrentHashMap<>();
     private final Map<String, MockToken> accessTokens = new ConcurrentHashMap<>();
     private final Map<String, MockToken> refreshTokens = new ConcurrentHashMap<>();
-    private final Set<String> revokedTokens = ConcurrentHashMap.newKeySet();
+    private final Map<String, Instant> revokedTokens = new ConcurrentHashMap<>();
+    private final Map<String, Instant> deviceLastSeen = new ConcurrentHashMap<>();
 
     public MockIdentityService(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
@@ -52,17 +54,20 @@ public class MockIdentityService {
             throw new BadCredentialsException("Invalid email or password.");
         }
 
-        return issueTokens(account, normalizeDeviceId(deviceId));
+        String normalizedDeviceId = requireDeviceId(deviceId);
+        touchDevice(normalizedDeviceId);
+        return issueTokens(account, normalizedDeviceId);
     }
 
     public AuthResponse refresh(String refreshToken, String deviceId) {
         MockToken token = requireValidToken(cleanToken(refreshToken), TokenKind.REFRESH, refreshTokens);
-        String normalizedDeviceId = normalizeDeviceId(deviceId);
+        String normalizedDeviceId = requireDeviceId(deviceId);
 
         if (!Objects.equals(token.deviceId(), normalizedDeviceId)) {
             throw new BadCredentialsException("Refresh token is bound to a different device.");
         }
 
+        touchDevice(normalizedDeviceId);
         revokeToken(token.value());
         return issueTokens(loadAccountByEmail(token.email()), normalizedDeviceId);
     }
@@ -74,17 +79,14 @@ public class MockIdentityService {
 
     public MockAuthenticatedUser authenticate(String authorizationHeader, String deviceId) {
         String rawToken = extractBearerToken(authorizationHeader);
-        String normalizedDeviceId = normalizeDeviceId(deviceId);
-
-        if (normalizedDeviceId.isBlank()) {
-            throw new InsufficientAuthenticationException("X-Device-ID header is required.");
-        }
+        String normalizedDeviceId = requireDeviceId(deviceId);
 
         MockToken token = requireValidToken(rawToken, TokenKind.ACCESS, accessTokens);
         if (!Objects.equals(token.deviceId(), normalizedDeviceId)) {
             throw new BadCredentialsException("Access token is bound to a different device.");
         }
 
+        touchDevice(normalizedDeviceId);
         return new MockAuthenticatedUser(token.email(), token.deviceId(), token.authorities());
     }
 
@@ -130,10 +132,6 @@ public class MockIdentityService {
 
     public MockAccount currentAccount(Authentication authentication) {
         return loadAccountByEmail(currentUser(authentication).email());
-    }
-
-    public String defaultDeviceId() {
-        return DEFAULT_DEVICE_ID;
     }
 
     private MockAccount register(String email, String password, Set<String> authorities) {
@@ -201,7 +199,7 @@ public class MockIdentityService {
                     ? "Bearer token is required."
                     : "Refresh token is required.");
         }
-        if (revokedTokens.contains(tokenValue)) {
+        if (revokedTokens.containsKey(tokenValue)) {
             throw new CredentialsExpiredException("Token has been revoked.");
         }
 
@@ -211,7 +209,7 @@ public class MockIdentityService {
         }
         if (token.expiresAt().isBefore(Instant.now())) {
             registry.remove(tokenValue);
-            revokedTokens.add(tokenValue);
+            revokedTokens.put(tokenValue, Instant.now());
             throw new CredentialsExpiredException("Token has expired.");
         }
 
@@ -226,7 +224,7 @@ public class MockIdentityService {
         }
         accessTokens.remove(tokenValue);
         refreshTokens.remove(tokenValue);
-        revokedTokens.add(tokenValue);
+        revokedTokens.put(tokenValue, Instant.now());
     }
 
     private void pruneExpiredTokens(Map<String, MockToken> registry) {
@@ -234,7 +232,7 @@ public class MockIdentityService {
         registry.values().removeIf(token -> {
             boolean expired = token.expiresAt().isBefore(now);
             if (expired) {
-                revokedTokens.add(token.value());
+                revokedTokens.put(token.value(), now);
             }
             return expired;
         });
@@ -254,8 +252,37 @@ public class MockIdentityService {
         return tokenValue == null ? null : tokenValue.trim();
     }
 
-    private String normalizeDeviceId(String deviceId) {
-        return deviceId == null || deviceId.isBlank() ? DEFAULT_DEVICE_ID : deviceId.trim();
+    private String requireDeviceId(String deviceId) {
+        if (deviceId == null || deviceId.isBlank()) {
+            throw new InsufficientAuthenticationException("Device cookie is required.");
+        }
+        return deviceId.trim();
+    }
+
+    private void touchDevice(String deviceId) {
+        deviceLastSeen.put(deviceId, Instant.now());
+    }
+
+    @Scheduled(fixedRate = 3_600_000, initialDelay = 3_600_000)
+    public void cleanupInactiveAuthState() {
+        Instant now = Instant.now();
+        Instant inactiveBefore = now.minus(DEVICE_IDLE_TTL);
+
+        pruneExpiredTokens(accessTokens);
+        pruneExpiredTokens(refreshTokens);
+
+        Set<String> inactiveDevices = deviceLastSeen.entrySet().stream()
+                .filter(entry -> entry.getValue().isBefore(inactiveBefore))
+                .map(Map.Entry::getKey)
+                .collect(java.util.stream.Collectors.toSet());
+
+        if (!inactiveDevices.isEmpty()) {
+            accessTokens.values().removeIf(token -> inactiveDevices.contains(token.deviceId()));
+            refreshTokens.values().removeIf(token -> inactiveDevices.contains(token.deviceId()));
+            inactiveDevices.forEach(deviceLastSeen::remove);
+        }
+
+        revokedTokens.entrySet().removeIf(entry -> entry.getValue().isBefore(inactiveBefore));
     }
 
     private String normalizeEmail(String email) {
