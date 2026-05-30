@@ -1,0 +1,21 @@
+Item ID,Item Name,Category,Brand,Unit,Quantity,Unit Price,Discount %,Tax %,Final Price,In Stock
+GR001,Basmati Rice,Grains,India Gate,5 kg,2,599.00,5,5,1195.81,Yes
+GR002,Toor Dal,Pulses,Tata Sampann,1 kg,3,165.00,0,5,519.75,Yes
+GR003,Sunflower Oil,Cooking Oil,Fortune,1 L,4,149.00,10,5,563.22,Yes
+GR004,Whole Wheat Atta,Flour,Aashirvaad,10 kg,1,489.00,5,5,488.08,Yes
+GR005,Milk,Dairy,Amul,500 ml,6,28.00,0,0,168.00,Yes
+GR006,Curd,Dairy,Amul,400 g,2,42.00,0,0,84.00,Yes
+GR007,Brown Bread,Bakery,Britannia,400 g,2,45.00,0,0,90.00,Yes
+GR008,Eggs,Poultry,Local Farm,12 pcs,2,78.00,0,0,156.00,Yes
+GR009,Tomatoes,Vegetables,Fresh Farm,1 kg,2,38.00,0,0,76.00,Yes
+GR010,Onions,Vegetables,Fresh Farm,1 kg,3,34.00,0,0,102.00,Yes
+GR011,Potatoes,Vegetables,Fresh Farm,1 kg,5,28.00,0,0,140.00,Yes
+GR012,Bananas,Fruits,Fresh Farm,1 dozen,1,65.00,0,0,65.00,Yes
+GR013,Apples,Fruits,Washington,1 kg,2,189.00,5,0,359.10,Yes
+GR014,Sugar,Essentials,Madhur,1 kg,2,52.00,0,5,109.20,Yes
+GR015,Tea Powder,Beverages,Taj Mahal,500 g,1,285.00,10,5,269.33,Yes
+GR016,Instant Coffee,Beverages,Nescafe,200 g,1,349.00,5,5,348.13,Yes
+GR017,Chocolate Cookies,Snacks,Sunfeast,300 g,3,40.00,0,0,120.00,Yes
+GR018,Potato Chips,Snacks,Lays,100 g,4,20.00,0,0,80.00,Yes
+GR019,Liquid Detergent,Home Care,Surf Excel,1 L,1,210.00,15,18,210.63,Yes
+GR020,Dishwash Gel,Home Care,Vim,750 ml,1,99.00,5,18,110.56,No

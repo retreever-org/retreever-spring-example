@@ -40,6 +40,14 @@ public class MockDeviceCookieService {
         return deviceId;
     }
 
+    public String getOrCreateDeviceId(HttpServletRequest request) {
+        String deviceId = getDeviceId(request);
+        if (!hasText(deviceId)) {
+            return UUID.randomUUID().toString();
+        }
+        return deviceId;
+    }
+
     public void refreshDeviceCookie(HttpServletRequest request, HttpServletResponse response, String deviceId) {
         if (hasText(deviceId)) {
             writeDeviceCookie(request, response, deviceId.trim());

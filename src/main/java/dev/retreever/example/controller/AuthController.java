@@ -7,6 +7,7 @@ import dev.retreever.example.dto.request.LogoutRequest;
 import dev.retreever.example.dto.request.RefreshRequest;
 import dev.retreever.example.dto.request.UserCredentials;
 import dev.retreever.example.service.AuthService;
+import dev.retreever.example.security.MockDeviceCookieService;
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +27,7 @@ import java.util.List;
 public class AuthController {
 
     private final AuthService authService;
+    private final MockDeviceCookieService deviceCookieService;
 
     @PostMapping(value = "/public/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<AuthResponse>> loginUser(
@@ -34,7 +36,9 @@ public class AuthController {
             HttpServletResponse response
     ) {
         System.out.println(userCredentials.toString());
-        AuthResponse authResponse = authService.loginUser(userCredentials, request, response);
+        String deviceId = deviceCookieService.getOrCreateDeviceId(request);
+        AuthResponse authResponse = authService.loginUser(userCredentials, deviceId);
+        deviceCookieService.refreshDeviceCookie(request, response, deviceId);
         return ResponseEntity
                 .ok()
                 .body(ApiResponse.success(
@@ -49,7 +53,9 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        AuthResponse authResponse = authService.refreshLogin(refreshRequest.refreshToken(), request, response);
+        String deviceId = deviceCookieService.getDeviceId(request);
+        AuthResponse authResponse = authService.refreshLogin(refreshRequest.refreshToken(), deviceId);
+        deviceCookieService.refreshDeviceCookie(request, response, deviceId);
         return ResponseEntity
                 .ok()
                 .body(ApiResponse.success(

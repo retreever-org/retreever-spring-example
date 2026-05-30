@@ -12,19 +12,20 @@ logging:
 # Retreever Environment Configuration
 retreever:
   enabled: true
-  example:
-    frame-ancestors: ${RETREEVER_FRAME_ANCESTORS:}
-  dev:
-    allow-cross-origin: ${RETREEVER_DEV_ALLOW_CROSS_ORIGIN:}
-  studio:
-    storage: indexed-db
-  security:
-    hint-log: false
   auth:
     username: ${RETREEVER_AUTH_USERNAME:}
     password: ${RETREEVER_AUTH_PASSWORD:}
+    secure-cookies: ${RETREEVER_AUTH_SECURE_COOKIES:true}
+  security:
+    hint-log: false
+#  studio:
+#    storage: indexed-db
 
-# Environment Variable Automation
+# Applicable only for the internal applications only. Host applications need not have to set these.
+  dev:
+    allow-cross-origin: ${RETREEVER_DEV_ALLOW_CROSS_ORIGIN:}
+
+# ----------------- Environment Variable Automation ------------------
   env:
     variables:
 

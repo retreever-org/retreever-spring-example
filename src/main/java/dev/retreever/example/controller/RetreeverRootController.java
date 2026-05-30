@@ -12,10 +12,4 @@ import java.io.IOException;
 @Controller
 public class RetreeverRootController {
 
-    @GetMapping("/")
-    public void forwardToRetreever(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/retreever");
-        dispatcher.forward(request, response);
-    }
 }
