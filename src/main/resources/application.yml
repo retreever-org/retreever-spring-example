@@ -18,8 +18,8 @@ retreever:
     secure-cookies: ${RETREEVER_AUTH_SECURE_COOKIES:true}
   security:
     hint-log: false
-#  studio:
-#    storage: indexed-db
+  studio:
+    storage: indexed-db
 
 # Applicable only for the internal applications only. Host applications need not have to set these.
   dev:
