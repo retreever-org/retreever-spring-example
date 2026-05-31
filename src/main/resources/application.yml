@@ -3,7 +3,7 @@ spring:
     name: retreever-example
 
 server:
-  port: 9000
+  port: ${PORT:${SERVER_PORT:9000}}
 
 logging:
   level:
