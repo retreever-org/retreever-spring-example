@@ -29,17 +29,13 @@
 	<properties>
 		<java.version>21</java.version>
 	</properties>
-	<repositories>
-		<repository>
-			<id>local-retreever-test</id>
-			<url>file://${project.basedir}/local-maven-repo</url>
-		</repository>
-	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>dev.retreever</groupId>
 			<artifactId>retreever</artifactId>
 			<version>1.1.0-local-test</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/libs/retreever-1.1.0-local-test.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -89,6 +85,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<includeSystemScope>true</includeSystemScope>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
