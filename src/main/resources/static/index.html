@@ -121,7 +121,7 @@
         .brand-text {
             margin-top: 4px;
             font-size: 0.72rem;
-            font-weight: 600;
+            font-weight: 400;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             color: #a1a1aa;
@@ -141,8 +141,15 @@
             width: min(720px, 100%);
             margin: 28px auto 0;
             color: var(--muted);
-            font-size: clamp(0.9rem, 1vw, 0.84rem);
+            font-size: clamp(1rem, 1vw, 0.8rem);
             line-height: 1.7;
+        }
+
+        .inline-link {
+            color: inherit;
+            text-decoration: underline;
+            text-decoration-color: currentColor;
+            text-underline-offset: 0.14em;
         }
 
         .action {
@@ -259,8 +266,8 @@
 
             <p>
                 Hey, this is a Retreever-hosted experience studio where you can explore sample APIs,
-                test live flows, see how everything works together, and share your thoughts at
-                hello@retreever.dev.
+                test live flows, see how everything works together. Share your thoughts at
+                <a class="inline-link" href="mailto:hello@retreever.dev">hello@retreever.dev</a>.
             </p>
 
             <div class="action">
