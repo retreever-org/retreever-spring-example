@@ -134,7 +134,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html").permitAll()
+                        .requestMatchers("/", "/index.html", "/assets/**", "/favicon.ico").permitAll()
                         .requestMatchers(RetreeverPublicPaths.get()).permitAll()
                         .requestMatchers("/retreever/**", "/error").permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()

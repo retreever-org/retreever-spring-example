@@ -43,4 +43,16 @@ class SecurityCorsIntegrationTest {
         assertEquals(200, response.statusCode());
         assertEquals("http://localhost:" + port + "/", response.uri().toString());
     }
+
+    @Test
+    void staticBrandIconIsPublic() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/assets/icon192v2.png"))
+                .GET()
+                .build();
+
+        HttpResponse<byte[]> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+        assertEquals(200, response.statusCode());
+    }
 }
