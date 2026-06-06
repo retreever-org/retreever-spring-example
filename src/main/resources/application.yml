@@ -10,9 +10,20 @@ logging:
   level:
     org.springframework.security: INFO
 
-# Retreever Environment Configuration
 retreever:
   enabled: true
+  example:
+    device-cookie:
+      secret: ${RETREEVER_EXAMPLE_DEVICE_COOKIE_SECRET:retreever-example-device-cookie-secret-change-me}
+    rate-limit:
+      request:
+        per-minute: ${RETREEVER_EXAMPLE_REQUESTS_PER_MINUTE:20}
+        per-day: ${RETREEVER_EXAMPLE_REQUESTS_PER_DAY:500}
+      upload:
+        per-minute: ${RETREEVER_EXAMPLE_UPLOADS_PER_MINUTE:2}
+        per-day: ${RETREEVER_EXAMPLE_UPLOADS_PER_DAY:20}
+    retention:
+      max-age: ${RETREEVER_EXAMPLE_RETENTION_MAX_AGE:PT5H}
   auth:
     username: ${RETREEVER_AUTH_USERNAME:}
     password: ${RETREEVER_AUTH_PASSWORD:}

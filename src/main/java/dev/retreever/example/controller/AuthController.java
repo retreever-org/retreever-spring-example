@@ -35,8 +35,7 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        System.out.println(userCredentials.toString());
-        String deviceId = deviceCookieService.getOrCreateDeviceId(request);
+        String deviceId = deviceCookieService.getOrCreateDeviceId(request, response);
         AuthResponse authResponse = authService.loginUser(userCredentials, deviceId);
         deviceCookieService.refreshDeviceCookie(request, response, deviceId);
         return ResponseEntity

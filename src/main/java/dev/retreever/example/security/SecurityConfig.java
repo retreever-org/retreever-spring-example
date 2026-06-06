@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.retreever.config.RetreeverPublicPaths;
 import dev.retreever.example.dto.envelope.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -36,6 +37,10 @@ import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
+@EnableConfigurationProperties({
+        ApiRateLimitProperties.class,
+        InMemoryStateRetentionProperties.class
+})
 public class SecurityConfig {
 
     @Bean
@@ -118,6 +123,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
+            ApiRequestRateLimitFilter apiRequestRateLimitFilter,
             MockBearerAuthenticationFilter authenticationFilter,
             AuthenticationEntryPoint authenticationEntryPoint,
             AccessDeniedHandler accessDeniedHandler,
@@ -141,7 +147,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/scenarios/public/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(apiRequestRateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(authenticationFilter, ApiRequestRateLimitFilter.class);
 
         return http.build();
     }

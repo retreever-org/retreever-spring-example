@@ -63,6 +63,19 @@ class SecurityCorsIntegrationTest {
     }
 
     @Test
+    void firstApiRequestIssuesDeviceCookie() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/public/brands"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(200, response.statusCode());
+        assertTrue(extractDeviceCookie(response) != null && !extractDeviceCookie(response).isBlank());
+    }
+
+    @Test
     void secureEndpointReturnsShortLoginHintForUnauthorizedRequests() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:" + port + "/api/v1/scenarios/secure/echo"))
@@ -146,6 +159,43 @@ class SecurityCorsIntegrationTest {
     }
 
     @Test
+    void publicApiRequestsAreLimitedPerDeviceAndIp() throws Exception {
+        String deviceCookie = issuePublicDeviceCookie();
+
+        for (int attempt = 0; attempt < 19; attempt++) {
+            HttpResponse<String> response = sendPublicBrandsRequest(deviceCookie);
+            assertEquals(200, response.statusCode());
+            deviceCookie = extractDeviceCookie(response);
+        }
+
+        HttpResponse<String> limitedResponse = sendPublicBrandsRequest(deviceCookie);
+
+        assertEquals(429, limitedResponse.statusCode());
+        assertTrue(limitedResponse.body().contains("Too Many Requests"));
+    }
+
+    @Test
+    void uploadPresignVolumeIsLimitedPerDeviceAndIp() throws Exception {
+        LoginSession adminSession = login(
+                MockIdentityService.DEFAULT_DEMO_EMAIL,
+                MockIdentityService.DEFAULT_DEMO_PASSWORD
+        );
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/products/variants/1/images/presign?upload_count=3"))
+                .header("Authorization", "Bearer " + adminSession.accessToken())
+                .header("Cookie", adminSession.deviceCookie())
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString("{\"content_type\":\"image/png\"}"))
+                .build();
+
+        HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(429, response.statusCode());
+        assertTrue(response.body().contains("Too many upload requests"));
+    }
+
+    @Test
     void seededDemoAdminCanLoginWithDefaultCredentials() throws Exception {
         LoginSession adminSession = login(
                 MockIdentityService.DEFAULT_DEMO_EMAIL,
@@ -197,10 +247,30 @@ class SecurityCorsIntegrationTest {
         JsonNode body = OBJECT_MAPPER.readTree(response.body());
         String accessToken = body.path("data").path("access_token").asText();
         String refreshToken = body.path("data").path("refresh_token").asText();
-        String setCookieHeader = response.headers().firstValue("set-cookie").orElse("");
-        String deviceCookie = setCookieHeader.split(";", 2)[0];
+        String deviceCookie = extractDeviceCookie(response);
 
         return new LoginSession(accessToken, refreshToken, deviceCookie);
+    }
+
+    private String issuePublicDeviceCookie() throws Exception {
+        HttpResponse<String> response = sendPublicBrandsRequest(null);
+        assertEquals(200, response.statusCode());
+        return extractDeviceCookie(response);
+    }
+
+    private HttpResponse<String> sendPublicBrandsRequest(String deviceCookie) throws Exception {
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + port + "/api/v1/public/brands"))
+                .GET();
+        if (deviceCookie != null && !deviceCookie.isBlank()) {
+            requestBuilder.header("Cookie", deviceCookie);
+        }
+        return HTTP_CLIENT.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    private String extractDeviceCookie(HttpResponse<?> response) {
+        String setCookieHeader = response.headers().firstValue("set-cookie").orElse("");
+        return setCookieHeader.isBlank() ? null : setCookieHeader.split(";", 2)[0];
     }
 
     private String urlEncode(String value) {

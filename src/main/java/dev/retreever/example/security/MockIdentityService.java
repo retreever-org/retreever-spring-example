@@ -21,14 +21,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
 public class MockIdentityService {
 
     private static final Duration ACCESS_TTL = Duration.ofMinutes(15);
     private static final Duration REFRESH_TTL = Duration.ofDays(7);
-    private static final Duration DEVICE_IDLE_TTL = Duration.ofHours(12);
     public static final String DEFAULT_DEMO_EMAIL = "admin@quickcart.test";
     public static final String DEFAULT_DEMO_PASSWORD = "Passw0rd!";
     private static final String DEFAULT_DEMO_LOGIN_HINT =
@@ -43,6 +41,7 @@ public class MockIdentityService {
     private final Map<String, MockToken> refreshTokens = new ConcurrentHashMap<>();
     private final Map<String, Instant> revokedTokens = new ConcurrentHashMap<>();
     private final Map<String, Instant> deviceLastSeen = new ConcurrentHashMap<>();
+    private final Set<String> seededAccounts = ConcurrentHashMap.newKeySet();
 
     public MockIdentityService(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
@@ -62,6 +61,7 @@ public class MockIdentityService {
         }
 
         String normalizedDeviceId = requireDeviceId(deviceId);
+        touchAccount(account.email());
         touchDevice(normalizedDeviceId);
         return issueTokens(account, normalizedDeviceId);
     }
@@ -75,6 +75,7 @@ public class MockIdentityService {
         }
 
         touchDevice(normalizedDeviceId);
+        touchAccount(token.email());
         revokeToken(token.value());
         return issueTokens(loadAccountByEmail(token.email()), normalizedDeviceId);
     }
@@ -132,7 +133,7 @@ public class MockIdentityService {
             return account;
         }
 
-        MockAccount promoted = account.withAuthorities(Set.of("customer", "seller"));
+        MockAccount promoted = account.withAuthorities(Set.of("customer", "seller"), Instant.now());
         accounts.put(promoted.email(), promoted);
         return promoted;
     }
@@ -156,7 +157,9 @@ public class MockIdentityService {
                 passwordEncoder.encode(password),
                 Set.copyOf(authorities),
                 true,
-                false
+                false,
+                Instant.now(),
+                Instant.now()
         );
         accounts.put(normalizedEmail, account);
         return account;
@@ -182,7 +185,8 @@ public class MockIdentityService {
                 account.email(),
                 deviceId,
                 account.authorities(),
-                now.plus(ACCESS_TTL)
+                now.plus(ACCESS_TTL),
+                now
         ));
         refreshTokens.put(refreshToken, new MockToken(
                 refreshToken,
@@ -190,7 +194,8 @@ public class MockIdentityService {
                 account.email(),
                 deviceId,
                 account.authorities(),
-                now.plus(REFRESH_TTL)
+                now.plus(REFRESH_TTL),
+                now
         ));
 
         return new AuthResponse(
@@ -224,9 +229,12 @@ public class MockIdentityService {
             throw new CredentialsExpiredException("Token has expired.");
         }
 
+        Instant now = Instant.now();
+        registry.put(tokenValue, token.touch(now));
         MockAccount account = loadAccountByEmail(token.email());
         validateAccount(account);
-        return token;
+        touchAccount(account.email());
+        return registry.get(tokenValue);
     }
 
     private void revokeToken(String tokenValue) {
@@ -274,26 +282,26 @@ public class MockIdentityService {
         deviceLastSeen.put(deviceId, Instant.now());
     }
 
-    @Scheduled(fixedRate = 3_600_000, initialDelay = 3_600_000)
-    public void cleanupInactiveAuthState() {
-        Instant now = Instant.now();
-        Instant inactiveBefore = now.minus(DEVICE_IDLE_TTL);
-
+    public void purgeOlderThan(Instant cutoff) {
         pruneExpiredTokens(accessTokens);
         pruneExpiredTokens(refreshTokens);
 
-        Set<String> inactiveDevices = deviceLastSeen.entrySet().stream()
-                .filter(entry -> entry.getValue().isBefore(inactiveBefore))
+        Set<String> staleDevices = deviceLastSeen.entrySet().stream()
+                .filter(entry -> entry.getValue().isBefore(cutoff))
                 .map(Map.Entry::getKey)
                 .collect(java.util.stream.Collectors.toSet());
 
-        if (!inactiveDevices.isEmpty()) {
-            accessTokens.values().removeIf(token -> inactiveDevices.contains(token.deviceId()));
-            refreshTokens.values().removeIf(token -> inactiveDevices.contains(token.deviceId()));
-            inactiveDevices.forEach(deviceLastSeen::remove);
+        if (!staleDevices.isEmpty()) {
+            accessTokens.values().removeIf(token -> staleDevices.contains(token.deviceId()) || token.lastTouchedAt().isBefore(cutoff));
+            refreshTokens.values().removeIf(token -> staleDevices.contains(token.deviceId()) || token.lastTouchedAt().isBefore(cutoff));
+            staleDevices.forEach(deviceLastSeen::remove);
+        } else {
+            accessTokens.values().removeIf(token -> token.lastTouchedAt().isBefore(cutoff));
+            refreshTokens.values().removeIf(token -> token.lastTouchedAt().isBefore(cutoff));
         }
 
-        revokedTokens.entrySet().removeIf(entry -> entry.getValue().isBefore(inactiveBefore));
+        revokedTokens.entrySet().removeIf(entry -> entry.getValue().isBefore(cutoff));
+        accounts.entrySet().removeIf(entry -> shouldRemoveAccount(entry.getValue(), cutoff));
     }
 
     private String normalizeEmail(String email) {
@@ -323,8 +331,23 @@ public class MockIdentityService {
                 passwordEncoder.encode(password),
                 Set.copyOf(authorities),
                 enabled,
-                locked
+                locked,
+                Instant.now(),
+                Instant.now()
         ));
+        seededAccounts.add(normalizedEmail);
+    }
+
+    private void touchAccount(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        accounts.computeIfPresent(normalizedEmail, (ignored, account) -> account.touch(Instant.now()));
+    }
+
+    private boolean shouldRemoveAccount(MockAccount account, Instant cutoff) {
+        if (seededAccounts.contains(account.email())) {
+            return false;
+        }
+        return account.lastTouchedAt().isBefore(cutoff);
     }
 
     public record MockAccount(
@@ -332,14 +355,20 @@ public class MockIdentityService {
             String passwordHash,
             Set<String> authorities,
             boolean enabled,
-            boolean locked
+            boolean locked,
+            Instant createdAt,
+            Instant lastTouchedAt
     ) {
         public MockAccount {
             authorities = authorities == null ? Set.of() : Set.copyOf(authorities);
         }
 
-        public MockAccount withAuthorities(Set<String> newAuthorities) {
-            return new MockAccount(email, passwordHash, Set.copyOf(newAuthorities), enabled, locked);
+        public MockAccount withAuthorities(Set<String> newAuthorities, Instant touchedAt) {
+            return new MockAccount(email, passwordHash, Set.copyOf(newAuthorities), enabled, locked, createdAt, touchedAt);
+        }
+
+        public MockAccount touch(Instant touchedAt) {
+            return new MockAccount(email, passwordHash, authorities, enabled, locked, createdAt, touchedAt);
         }
     }
 
@@ -349,8 +378,12 @@ public class MockIdentityService {
             String email,
             String deviceId,
             Set<String> authorities,
-            Instant expiresAt
+            Instant expiresAt,
+            Instant lastTouchedAt
     ) {
+        private MockToken touch(Instant touchedAt) {
+            return new MockToken(value, kind, email, deviceId, authorities, expiresAt, touchedAt);
+        }
     }
 
     private enum TokenKind {
