@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
 
-@ConfigurationProperties(prefix = "retreever.example.retention")
+@ConfigurationProperties(prefix = "app.retention")
 public class InMemoryStateRetentionProperties {
 
     private Duration maxAge = Duration.ofHours(5);

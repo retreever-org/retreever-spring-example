@@ -4,40 +4,26 @@ spring:
 
 server:
   port: ${PORT:${SERVER_PORT:9000}}
-  forward-headers-strategy: framework
 
 logging:
   level:
     org.springframework.security: INFO
 
+# ================================== Retreever Properties | Start ==================================
+
 retreever:
   enabled: true
-  example:
-    device-cookie:
-      secret: ${RETREEVER_EXAMPLE_DEVICE_COOKIE_SECRET:retreever-example-device-cookie-secret-change-me}
-    rate-limit:
-      request:
-        per-minute: ${RETREEVER_EXAMPLE_REQUESTS_PER_MINUTE:20}
-        per-day: ${RETREEVER_EXAMPLE_REQUESTS_PER_DAY:500}
-      upload:
-        per-minute: ${RETREEVER_EXAMPLE_UPLOADS_PER_MINUTE:2}
-        per-day: ${RETREEVER_EXAMPLE_UPLOADS_PER_DAY:20}
-    retention:
-      max-age: ${RETREEVER_EXAMPLE_RETENTION_MAX_AGE:PT5H}
+  security:
+    hint-log: false
   auth:
     username: ${RETREEVER_AUTH_USERNAME:}
     password: ${RETREEVER_AUTH_PASSWORD:}
     secure-cookies: ${RETREEVER_AUTH_SECURE_COOKIES:true}
-  security:
-    hint-log: false
   studio:
     storage: indexed-db
 
-# Applicable only for the internal applications only. Host applications need not have to set these.
-  dev:
-    allow-cross-origin: ${RETREEVER_DEV_ALLOW_CROSS_ORIGIN:}
+# ============================= Retreever Properties | Env Automation ==============================
 
-# ----------------- Environment Variable Automation ------------------
   env:
     variables:
 
@@ -60,3 +46,21 @@ retreever:
             method: post
             response:
               body-attribute-path: data.refresh_token
+
+# # ================================== Retreever Properties | End ==================================
+
+app:
+  device-cookie:
+    secret: ${RETREEVER_EXAMPLE_DEVICE_COOKIE_SECRET:retreever-example-device-cookie-secret-change-me}
+  rate-limit:
+    request:
+      per-minute: ${RETREEVER_EXAMPLE_REQUESTS_PER_MINUTE:20}
+      per-day: ${RETREEVER_EXAMPLE_REQUESTS_PER_DAY:500}
+    upload:
+      per-minute: ${RETREEVER_EXAMPLE_UPLOADS_PER_MINUTE:2}
+      per-day: ${RETREEVER_EXAMPLE_UPLOADS_PER_DAY:20}
+  retention:
+    max-age: ${RETREEVER_EXAMPLE_RETENTION_MAX_AGE:PT5H}
+  dev:
+    allow-cross-origin: ${RETREEVER_DEV_ALLOW_CROSS_ORIGIN:}
+  frame-ancestors: ${RETREEVER_EXAMPLE_FRAME_ANCESTORS:}

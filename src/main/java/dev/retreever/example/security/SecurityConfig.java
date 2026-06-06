@@ -110,7 +110,7 @@ public class SecurityConfig {
 
     @Bean
     public FilterRegistrationBean<RetreeverDemoFrameAncestorsFilter> retreeverDemoFrameAncestorsFilterRegistration(
-            @Value("${retreever.example.frame-ancestors:}") String frameAncestors
+            @Value("${app.frame-ancestors:}") String frameAncestors
     ) {
         FilterRegistrationBean<RetreeverDemoFrameAncestorsFilter> registration =
                 new FilterRegistrationBean<>(new RetreeverDemoFrameAncestorsFilter(frameAncestors));
@@ -155,7 +155,7 @@ public class SecurityConfig {
 
     private static List<String> bindAllowedOrigins(Environment environment) {
         Binder binder = Binder.get(environment);
-        var configuredOrigins = binder.bind("retreever.dev.allow-cross-origin", Bindable.listOf(String.class));
+        var configuredOrigins = binder.bind("app.dev.allow-cross-origin", Bindable.listOf(String.class));
         List<String> rawOrigins = configuredOrigins.isBound()
                 ? configuredOrigins.get()
                 : binder.bind("retreever.allow-cross-origin", Bindable.listOf(String.class)).orElse(List.of());

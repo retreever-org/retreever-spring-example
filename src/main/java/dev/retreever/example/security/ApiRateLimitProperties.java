@@ -2,7 +2,7 @@ package dev.retreever.example.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "retreever.example.rate-limit")
+@ConfigurationProperties(prefix = "app.rate-limit")
 public class ApiRateLimitProperties {
 
     private final Limit request = new Limit(20, 500);

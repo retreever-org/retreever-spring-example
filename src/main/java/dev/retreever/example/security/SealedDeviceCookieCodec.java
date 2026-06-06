@@ -25,7 +25,7 @@ public class SealedDeviceCookieCodec {
     private final SecureRandom secureRandom = new SecureRandom();
 
     public SealedDeviceCookieCodec(
-            @Value("${retreever.example.device-cookie.secret:retreever-example-device-cookie-secret-change-me}") String secret
+            @Value("${app.device-cookie.secret:retreever-example-device-cookie-secret-change-me}") String secret
     ) {
         this.secretKeySpec = new SecretKeySpec(deriveAesKey(secret), "AES");
     }
