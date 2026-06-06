@@ -7,6 +7,7 @@ import dev.retreever.example.exception.scenario.ScenarioInternalServerException;
 import dev.retreever.example.exception.scenario.ScenarioNotFoundException;
 import dev.retreever.example.exception.scenario.ScenarioUnauthorizedException;
 import dev.retreever.example.security.MockAuthenticatedUser;
+import dev.retreever.example.security.MockIdentityService;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -92,7 +93,7 @@ public class ScenarioResponseService {
     public ScenarioPayloads.AuthorizationProblem unauthorizedProblem(ScenarioUnauthorizedException ex) {
         return new ScenarioPayloads.AuthorizationProblem(
                 "SCENARIO_UNAUTHORIZED",
-                ex.getMessage(),
+                MockIdentityService.defaultDemoLoginHint(),
                 "anonymous",
                 "authenticated",
                 Instant.now().truncatedTo(ChronoUnit.SECONDS)
@@ -102,7 +103,7 @@ public class ScenarioResponseService {
     public ScenarioPayloads.AuthorizationProblem forbiddenProblem(ScenarioForbiddenException ex) {
         return new ScenarioPayloads.AuthorizationProblem(
                 "SCENARIO_FORBIDDEN",
-                ex.getMessage(),
+                MockIdentityService.defaultDemoLoginHint(),
                 "seller@quickcart.test",
                 "admin",
                 Instant.now().truncatedTo(ChronoUnit.SECONDS)

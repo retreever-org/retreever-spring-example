@@ -7,6 +7,7 @@ import dev.retreever.example.dto.envelope.FieldError;
 import dev.retreever.example.exception.ProductNotFoundException;
 import dev.retreever.example.exception.ProductVariantNotFoundException;
 import dev.retreever.example.exception.UserNotFoundException;
+import dev.retreever.example.security.MockIdentityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -72,7 +73,7 @@ public class ApplicationExceptionHandler {
     })
     public ResponseEntity<ApiErrorResponse> handleAuthenticationFailure(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiErrorResponse.build("Unauthorized", ex.getMessage()));
+                .body(ApiErrorResponse.build("Unauthorized", MockIdentityService.defaultDemoLoginHint()));
     }
 
     @ApiError(
@@ -82,7 +83,7 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ApiErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ApiErrorResponse.build("Access Denied", ex.getMessage()));
+                .body(ApiErrorResponse.build("Access Denied", MockIdentityService.defaultDemoLoginHint()));
     }
 
     @ApiError(

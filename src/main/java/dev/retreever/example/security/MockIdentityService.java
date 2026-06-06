@@ -29,6 +29,13 @@ public class MockIdentityService {
     private static final Duration ACCESS_TTL = Duration.ofMinutes(15);
     private static final Duration REFRESH_TTL = Duration.ofDays(7);
     private static final Duration DEVICE_IDLE_TTL = Duration.ofHours(12);
+    public static final String DEFAULT_DEMO_EMAIL = "admin@quickcart.test";
+    public static final String DEFAULT_DEMO_PASSWORD = "Passw0rd!";
+    private static final String DEFAULT_DEMO_LOGIN_HINT =
+            "You are not logged in. You can use dummy login: "
+                    + DEFAULT_DEMO_EMAIL
+                    + " / "
+                    + DEFAULT_DEMO_PASSWORD;
 
     private final PasswordEncoder passwordEncoder;
     private final Map<String, MockAccount> accounts = new ConcurrentHashMap<>();
@@ -132,6 +139,10 @@ public class MockIdentityService {
 
     public MockAccount currentAccount(Authentication authentication) {
         return loadAccountByEmail(currentUser(authentication).email());
+    }
+
+    public static String defaultDemoLoginHint() {
+        return DEFAULT_DEMO_LOGIN_HINT;
     }
 
     private MockAccount register(String email, String password, Set<String> authorities) {
@@ -300,7 +311,7 @@ public class MockIdentityService {
     private void seedAccounts() {
         seed("customer@quickcart.test", "Passw0rd!", Set.of("customer"), true, false);
         seed("seller@quickcart.test", "Passw0rd!", Set.of("customer", "seller"), true, false);
-        seed("admin@quickcart.test", "Passw0rd!", Set.of("customer", "seller", "admin"), true, false);
+        seed(DEFAULT_DEMO_EMAIL, DEFAULT_DEMO_PASSWORD, Set.of("customer", "seller", "admin"), true, false);
         seed("locked@quickcart.test", "Passw0rd!", Set.of("customer"), true, true);
         seed("disabled@quickcart.test", "Passw0rd!", Set.of("customer"), false, false);
     }

@@ -16,10 +16,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Component
 public class MockBearerAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final List<String> EXCLUDED_PATH_PREFIXES = List.of(
+            "/api/v1/public/",
+            "/api/v1/scenarios/public/"
+    );
 
     private final MockIdentityService identityService;
     private final AuthenticationEntryPoint authenticationEntryPoint;
@@ -37,7 +43,11 @@ public class MockBearerAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !request.getRequestURI().startsWith("/api/v1");
+        String requestUri = request.getRequestURI();
+        if (!requestUri.startsWith("/api/v1")) {
+            return true;
+        }
+        return EXCLUDED_PATH_PREFIXES.stream().anyMatch(requestUri::startsWith);
     }
 
     @Override

@@ -62,7 +62,7 @@ public class SecurityConfig {
                 response,
                 HttpStatus.UNAUTHORIZED,
                 "Unauthorized",
-                authException.getMessage(),
+                MockIdentityService.defaultDemoLoginHint(),
                 objectMapper
         );
     }
@@ -73,7 +73,7 @@ public class SecurityConfig {
                 response,
                 HttpStatus.FORBIDDEN,
                 "Forbidden",
-                accessDeniedException.getMessage(),
+                MockIdentityService.defaultDemoLoginHint(),
                 objectMapper
         );
     }
