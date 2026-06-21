@@ -33,9 +33,9 @@
 		<dependency>
 			<groupId>dev.retreever</groupId>
 			<artifactId>retreever</artifactId>
-			<version>1.1.2-local-test</version>
+			<version>2.0.0-local-test</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/retreever-1.1.2-local-test.jar</systemPath>
+			<systemPath>${project.basedir}/libs/retreever-2.0.0-local-test.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

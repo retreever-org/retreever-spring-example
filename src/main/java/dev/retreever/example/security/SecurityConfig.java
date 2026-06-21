@@ -33,6 +33,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -155,15 +156,32 @@ public class SecurityConfig {
 
     private static List<String> bindAllowedOrigins(Environment environment) {
         Binder binder = Binder.get(environment);
-        var configuredOrigins = binder.bind("app.dev.allow-cross-origin", Bindable.listOf(String.class));
-        List<String> rawOrigins = configuredOrigins.isBound()
-                ? configuredOrigins.get()
-                : binder.bind("retreever.allow-cross-origin", Bindable.listOf(String.class)).orElse(List.of());
+        List<String> rawOrigins = bindOriginProperty(binder, "app.dev.allow-cross-origin");
+        if (rawOrigins.isEmpty()) {
+            rawOrigins = bindOriginProperty(binder, "retreever.allow-cross-origin");
+        }
 
         return rawOrigins.stream()
                 .filter(StringUtils::hasText)
                 .map(String::trim)
                 .distinct()
+                .toList();
+    }
+
+    private static List<String> bindOriginProperty(Binder binder, String propertyName) {
+        var listBinding = binder.bind(propertyName, Bindable.listOf(String.class));
+        if (listBinding.isBound()) {
+            return listBinding.get();
+        }
+
+        String scalarValue = binder.bind(propertyName, Bindable.of(String.class)).orElse("");
+        if (!StringUtils.hasText(scalarValue)) {
+            return List.of();
+        }
+
+        return Arrays.stream(scalarValue.split(","))
+                .map(String::trim)
+                .filter(StringUtils::hasText)
                 .toList();
     }
 
